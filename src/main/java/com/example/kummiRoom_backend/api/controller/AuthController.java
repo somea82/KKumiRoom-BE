@@ -1,7 +1,7 @@
-package com.example.kummiRoom_backend.controller;
+package com.example.kummiRoom_backend.api.controller;
 
-import com.example.kummiRoom_backend.auth.AuthService;
-import com.example.kummiRoom_backend.auth.JwtService;
+import com.example.kummiRoom_backend.global.auth.AuthService;
+import com.example.kummiRoom_backend.global.auth.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

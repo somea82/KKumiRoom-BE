@@ -1,4 +1,4 @@
-package com.example.kummiRoom_backend.entity;
+package com.example.kummiRoom_backend.api.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.example.kummiRoom_backend.auth;
+package com.example.kummiRoom_backend.global.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
