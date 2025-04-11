@@ -2,10 +2,12 @@ package com.example.kummiRoom_backend.global.auth;
 
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AuthRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.RegisterRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.AuthResponseDto;
 import com.example.kummiRoom_backend.api.entity.User;
 import com.example.kummiRoom_backend.api.repository.UserRepository;
 import com.example.kummiRoom_backend.global.config.security.CryptoUtil;
+import com.example.kummiRoom_backend.global.exception.BadRequestException;
 import com.example.kummiRoom_backend.global.exception.ForbiddenException;
 import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import com.example.kummiRoom_backend.global.exception.UnauthorizedException;
@@ -20,10 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +53,46 @@ public class AuthService {
                 .accessToken(jwtService.generateAccessToken(user.getAuthId(), user.getUserId()))
                 .refreshToken(jwtService.generateRefreshToken(user.getAuthId(), user.getUserId()))
                 .build();
+    }
+
+    public void register(RegisterRequestDto request) {
+        try {
+            //todo 비밀번호 rule 설정
+            // Validate simple password ( 비밀번호는 6자 이상 12이하 )
+            if (request.getPassword() == null || request.getPassword().length() < 6
+                    || request.getPassword().length() > 13) {
+                throw new BadRequestException("올바른 비밀번호를 입력해주세요.");
+            }
+
+//휴대폰 번호 입력
+//            String formattedPhone = request.getPhone().replaceAll("-", "");
+
+
+            Optional<User> existingUser = userRepository.findAll().stream()
+                    .filter(user ->
+                            user.getAuthId().equals(request.getAuthId())
+                    )
+                    .findFirst();
+
+            // 기존 사용자가 있는 경우
+            if (existingUser.isPresent()) {
+                User user = existingUser.get();
+                throw new BadRequestException("이미 가입된 사용자 입니다.");
+            }
+
+            // 새로운 사용자 생성
+            User newUser = User.builder()
+                    .authId(request.getAuthId())
+                    .userName(request.getName())
+                    .password(CryptoUtil.encrypt(request.getPassword())) // 암호화 후 저장
+                    .build();
+
+            userRepository.save(newUser);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("회원가입 실패: " + e.getMessage());
+        }
     }
 
     public void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {

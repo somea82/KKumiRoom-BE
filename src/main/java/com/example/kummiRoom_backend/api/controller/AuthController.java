@@ -1,10 +1,12 @@
 package com.example.kummiRoom_backend.api.controller;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AuthRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.RegisterRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.AuthResponseDto;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
 import com.example.kummiRoom_backend.global.auth.JwtService;
+import com.example.kummiRoom_backend.global.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +45,14 @@ public class AuthController {
         authService.setAccessTokenCookie(newTokens.getAccessToken(), response);
 
         return ResponseEntity.ok(new ApiResult(200, "OK", "토큰 갱신 성공"));
+    }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<ApiResult> register(@RequestBody RegisterRequestDto request) {
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new BadRequestException("올바른 비밀번호를 입력해주세요.");
+        }
+        authService.register(request);
+        return ResponseEntity.ok(new ApiResult(200, "OK", "회원가입이 완료되었습니다."));
     }
 }
