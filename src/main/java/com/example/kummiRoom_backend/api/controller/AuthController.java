@@ -46,6 +46,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResult(200, "OK", "토큰 갱신 성공"));
     }
 
+    //회원가입
     @PostMapping("/sign-up")
     public ResponseEntity<ApiResult> register(@RequestBody RegisterRequestDto request) {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
