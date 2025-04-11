@@ -68,8 +68,6 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		// "*" 대신 구체적인 출처 지정
-		// BE IP : 43.201.141.241
-		// Mock IP : 43.200.79.16
 		configuration.setAllowedOrigins(List.of(
 			"http://127.0.0.1", "http://localhost:3000"));
 		configuration.addAllowedMethod("*");
