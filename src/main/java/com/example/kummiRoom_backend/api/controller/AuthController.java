@@ -1,5 +1,8 @@
 package com.example.kummiRoom_backend.api.controller;
 
+import com.example.kummiRoom_backend.api.dto.requestDto.AuthRequestDto;
+import com.example.kummiRoom_backend.api.dto.responseDto.AuthResponseDto;
+import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
 import com.example.kummiRoom_backend.global.auth.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,15 +20,14 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
-    @PostMapping("/sign-in")
-
     //사용자 로그인
+    @PostMapping("/sign-in")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto request, HttpServletResponse response) throws Exception {
         AuthResponseDto authResponse = authService.login(request);
 
         authService.setRefreshTokenCookie(authResponse.getRefreshToken(), response);
         authService.setAccessTokenCookie(authResponse.getAccessToken(), response);
 
-        return ResponseEntity.ok(new ApiResult(200, "Already Exists", "로그인에 성공했습니다."));
+        return ResponseEntity.ok(new ApiResult(200, "success login", "로그인에 성공했습니다."));
     }
 }
