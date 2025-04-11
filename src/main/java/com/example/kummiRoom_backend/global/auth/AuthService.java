@@ -35,6 +35,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final RedisService redisService;
 
     public AuthResponseDto login(AuthRequestDto request) throws Exception {
         User user = userRepository.findByAuthId(request.getAuthId())
@@ -62,19 +63,5 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-    }
-
-    private String buildToken(String authId, Long userId, Long expiration) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("roles", Collections.singletonList("ROLE_USER"));
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(authId)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
     }
 }

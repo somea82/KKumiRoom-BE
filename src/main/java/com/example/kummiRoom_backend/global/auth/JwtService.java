@@ -1,8 +1,14 @@
 package com.example.kummiRoom_backend.global.auth;
 
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +18,17 @@ import io.jsonwebtoken.Jwts;
 @Service
 @Slf4j
 public class JwtService {
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Getter
+    @Value("${jwt.access.token.expiration}")
+    private Long accessTokenExpiration;
+
+    @Getter
+    @Value("${jwt.refresh.token.expiration}")
+    private Long refreshTokenExpiration;
 
     public String generateAccessToken(String authId, Long userId) {
         String token = buildToken(authId, userId, accessTokenExpiration);
@@ -31,6 +48,10 @@ public class JwtService {
         String token = buildToken(authId, userId, refreshTokenExpiration);
         return token;
     }
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
     private String buildToken(String authId, Long userId, Long expiration) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
