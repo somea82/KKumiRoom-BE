@@ -18,6 +18,8 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/sign-in")
+
+    //사용자 로그인
     public ResponseEntity<?> login(@RequestBody AuthRequestDto request, HttpServletResponse response) throws Exception {
         AuthResponseDto authResponse = authService.login(request);
 
