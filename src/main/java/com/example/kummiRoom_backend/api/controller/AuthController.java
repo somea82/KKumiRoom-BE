@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
-    private final JwtService jwtService;
 
     //사용자 로그인
     @PostMapping("/sign-in")
