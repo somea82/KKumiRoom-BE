@@ -14,5 +14,4 @@ public class RegisterRequestDto {
     private Long schoolId;
     private Integer grade;
     private Integer classNumber;
-    private String email;
 }

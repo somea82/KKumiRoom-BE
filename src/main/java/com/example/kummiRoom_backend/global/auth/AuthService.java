@@ -76,7 +76,6 @@ public class AuthService {
 
             // 기존 사용자가 있는 경우
             if (existingUser.isPresent()) {
-                User user = existingUser.get();
                 throw new BadRequestException("이미 가입된 사용자 입니다.");
             }
 
