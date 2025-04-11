@@ -1,5 +1,6 @@
 package com.example.kummiRoom_backend.global.auth;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import io.jsonwebtoken.Jwts;
 
 @Service
@@ -44,10 +46,12 @@ public class JwtService {
         String token = buildToken(authId, userId, refreshTokenExpiration);
         return token;
     }
+
     public String generateRefreshTestToken(String authId, Long userId) {
         String token = buildToken(authId, userId, refreshTokenExpiration);
         return token;
     }
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
@@ -64,5 +68,40 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isValidToken(String token) {
+        try {
+            // todo 블랙리스트 체크
+            //if (redisService.isBlacklisted(token)) {
+            //    return false;
+            //}
+
+            // JWT 유효성 검증
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token.replace("Bearer ", ""));
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("userId", Long.class);
+    }
+
+    public String extractAuthId(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
