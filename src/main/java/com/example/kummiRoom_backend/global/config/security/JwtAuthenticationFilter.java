@@ -34,8 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
 
-		// Swagger 관련 경로와 OpenAPI 경로를 제외
-		return path.startsWith("/swagger-ui/") ||
+		return path.startsWith("/api/openai") ||
 			path.startsWith("/v3/api-docs") ||
 			path.startsWith("/swagger-resources") ||
 			path.startsWith("/webjars/") ||

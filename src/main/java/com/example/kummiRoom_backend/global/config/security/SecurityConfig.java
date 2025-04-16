@@ -42,7 +42,7 @@ public class SecurityConfig {
 			)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
-					"/swagger-ui/**",
+					"/api/openai/**",
 					"/v3/api-docs/**"
 				)
 				.permitAll()
