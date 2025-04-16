@@ -1,22 +1,15 @@
 package com.example.kummiRoom_backend.openApi;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NoArgsConstructor;
+import com.example.kummiRoom_backend.openApi.dto.requestDto.GetSchoolRequestDto;
+import com.example.kummiRoom_backend.openApi.dto.requestDto.NeisTimetableRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/openai")
+@RequestMapping("/api/openapi")
 public class OpenApiController {
     private final OpenApiService openApiService;
 
@@ -33,5 +26,15 @@ public class OpenApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/load-school")
+    public void getSchool(@RequestBody GetSchoolRequestDto request) throws Exception {
+        openApiService.getSchoolTable(request);
+//        try {
+//            return ResponseEntity.ok(openApiService.getSchoolTable(request));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
     }
 }

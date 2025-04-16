@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
 
-		return path.startsWith("/api/openai") ||
+		return path.startsWith("/api/openapi") ||
 			path.startsWith("/v3/api-docs") ||
 			path.startsWith("/swagger-resources") ||
 			path.startsWith("/webjars/") ||

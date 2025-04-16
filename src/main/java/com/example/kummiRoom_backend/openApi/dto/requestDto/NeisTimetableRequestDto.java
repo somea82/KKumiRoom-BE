@@ -1,4 +1,4 @@
-package com.example.kummiRoom_backend.openApi;
+package com.example.kummiRoom_backend.openApi.dto.requestDto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
