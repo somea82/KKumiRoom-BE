@@ -11,6 +11,7 @@ import com.example.kummiRoom_backend.global.exception.BadRequestException;
 import com.example.kummiRoom_backend.global.exception.ForbiddenException;
 import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import com.example.kummiRoom_backend.global.exception.UnauthorizedException;
+import com.example.kummiRoom_backend.openApi.SchoolRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
@@ -37,6 +38,7 @@ public class AuthService {
     private Long refreshTokenExpiration;
 
     private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
 
@@ -83,6 +85,7 @@ public class AuthService {
             User newUser = User.builder()
                     .authId(request.getAuthId())
                     .userName(request.getName())
+                    .school(schoolRepository.findBySchoolId(request.getSchoolId()))
                     .password(CryptoUtil.encrypt(request.getPassword())) // 암호화 후 저장
                     .build();
 

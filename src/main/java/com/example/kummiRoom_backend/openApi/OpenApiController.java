@@ -19,7 +19,7 @@ public class OpenApiController {
     @Value("a3f4664fd08e4aaf8253d94322698bc3")
     private String openApiKey;
 
-    @PostMapping("/load")
+    @PostMapping("/load-course")
     public ResponseEntity<?> getTimetable(@RequestBody NeisTimetableRequestDto request) {
         try {
             return ResponseEntity.ok(openApiService.getCourseFromTimeTable(request));

@@ -2,6 +2,7 @@ package com.example.kummiRoom_backend.openApi;
 
 import com.example.kummiRoom_backend.api.entity.Course;
 import com.example.kummiRoom_backend.api.entity.School;
+import com.example.kummiRoom_backend.api.repository.CourseRepository;
 import com.example.kummiRoom_backend.openApi.dto.requestDto.GetSchoolRequestDto;
 import com.example.kummiRoom_backend.openApi.dto.requestDto.NeisTimetableRequestDto;
 import com.fasterxml.jackson.databind.JsonNode;
