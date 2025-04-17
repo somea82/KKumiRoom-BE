@@ -1,5 +1,6 @@
 package com.example.kummiRoom_backend.openApi;
 
+import com.example.kummiRoom_backend.api.entity.Course;
 import com.example.kummiRoom_backend.api.entity.School;
 import com.example.kummiRoom_backend.openApi.dto.requestDto.GetSchoolRequestDto;
 import com.example.kummiRoom_backend.openApi.dto.requestDto.NeisTimetableRequestDto;
@@ -15,9 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class OpenApiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final SchoolRepository schoolRepository;
+    private final CourseRepository courseRepository;
 
     @Value("https://open.neis.go.kr/hub/hisTimetable")
     private String testBaseUrl;
@@ -35,13 +36,14 @@ public class OpenApiService {
     @Value("a3f4664fd08e4aaf8253d94322698bc3")
     private String openApiKey;
 
-    public List<HisTimetableRow> getTimeTable(NeisTimetableRequestDto req) throws Exception {
+    public List<Course> getTimeTable(NeisTimetableRequestDto req) throws Exception {
 
         String url = UriComponentsBuilder.fromHttpUrl(testBaseUrl)
                 .queryParam("KEY", openApiKey)
                 .queryParam("Type", "json")
                 .queryParam("ATPT_OFCDC_SC_CODE", req.getAtptOfcdcScCode())
                 .queryParam("SD_SCHUL_CODE", req.getSdSchulCode())
+                .queryParam("TI_FROM_YMD","20250401")
                 .toUriString();
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -53,6 +55,8 @@ public class OpenApiService {
         System.out.println("[DEBUG] NEIS 요청: " + url);
         System.out.println("[DEBUG] NEIS 응답: " + response.getBody());
 
+        Set<String> courseNameSet = new HashSet<>();
+        List<Course> courseList = new ArrayList<>();
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());
@@ -60,18 +64,32 @@ public class OpenApiService {
             JsonNode rowArray = root.path("hisTimetable").get(1).path("row");
             System.out.println("[DEBUG] JSON 응답: " + rowArray);
 
-            List<HisTimetableRow> schoolList = new ArrayList<>();
 
             if (rowArray.isArray()) {
                 for (JsonNode node : rowArray) {
-                    String name = node.path("SCHUL_NM").asText();
-                    HisTimetableRow row = new HisTimetableRow();
-                    row.setSchoolName(name);
-                    schoolList.add(row);
+                    String courseName = node.path("ITRT_CNTNT").asText();
+
+                    // 이미 저장된 과목은 스킵
+                    if (courseNameSet.contains(courseName)) continue;
+                    courseNameSet.add(courseName);
+                    System.out.println(courseNameSet);
+
+                    Course course = Course.builder()
+                            .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
+                            .courseName(courseName)
+                            .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
+                            .semester(node.path("AY").asText()) // 학년도
+                            .description(node.path("DGHT_CRSE_SC_NM").asText() + " " + node.path("GRADE").asText() + "학년") // 예: 주간 1학년
+                            .createdAt(LocalDateTime.now())
+                            .maxStudents(0) // 임의 초기값
+                            .build();
+                    System.out.println(course);
+                    courseList.add(course);
                 }
             }
 
-            return schoolList;
+
+            return courseRepository.saveAll(courseList);
         } else {
             throw new RuntimeException("NEIS API 호출 실패");
         }
