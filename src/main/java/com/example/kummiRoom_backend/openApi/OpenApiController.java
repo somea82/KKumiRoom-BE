@@ -22,7 +22,7 @@ public class OpenApiController {
     @PostMapping("/load")
     public ResponseEntity<?> getTimetable(@RequestBody NeisTimetableRequestDto request) {
         try {
-            return ResponseEntity.ok(openApiService.getTimeTable(request));
+            return ResponseEntity.ok(openApiService.getCourseFromTimeTable(request));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

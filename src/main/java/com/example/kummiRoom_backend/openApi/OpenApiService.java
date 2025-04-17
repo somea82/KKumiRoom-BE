@@ -36,7 +36,8 @@ public class OpenApiService {
     @Value("a3f4664fd08e4aaf8253d94322698bc3")
     private String openApiKey;
 
-    public List<Course> getTimeTable(NeisTimetableRequestDto req) throws Exception {
+
+    public List<Course> getCourseFromTimeTable(NeisTimetableRequestDto req) throws Exception {
 
         String url = UriComponentsBuilder.fromHttpUrl(testBaseUrl)
                 .queryParam("KEY", openApiKey)
