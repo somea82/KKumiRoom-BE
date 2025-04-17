@@ -19,6 +19,7 @@ public class Course {
     private String courseArea;
     private String semester;
     private String description;
+
     private Integer maxStudents;
 
     private LocalDateTime createdAt;
