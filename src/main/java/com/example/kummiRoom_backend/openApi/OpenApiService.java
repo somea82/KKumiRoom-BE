@@ -104,8 +104,6 @@ public class OpenApiService {
             JsonNode rowArray = root.path("schoolInfo").get(1).path("row");
             System.out.println("[DEBUG] JSON 응답: " + rowArray);
 
-            List<HisTimetableRow> schoolList = new ArrayList<>();
-
             if (rowArray.isArray()) {
                 //저장 함수
                 return saveSchoolsFromApi(rowArray);
@@ -124,7 +122,7 @@ public List<School> saveSchoolsFromApi(JsonNode rowArray) {
         // DB에 이미 있는지 확인
         Optional<School> existing = schoolRepository.findBySchoolName(node.path("SCHUL_NM").asText());
         School school = School.builder()
-                .schul_code(node.path("SD_SCHUL_CODE").asText())
+                .schoolId(Long.valueOf(node.path("SD_SCHUL_CODE").asText()))
                 .schoolName(node.path("SCHUL_NM").asText())
                 .address(node.path("ORG_RDNMA").asText())
                 .eduId(node.path("ATPT_OFCDC_SC_CODE").asText())

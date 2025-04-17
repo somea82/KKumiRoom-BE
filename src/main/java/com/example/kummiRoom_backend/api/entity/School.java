@@ -17,7 +17,6 @@ import java.util.List;
 public class School {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long schoolId;
 
     private String schoolName;
@@ -26,7 +25,6 @@ public class School {
     private String eduId;
     private String schoolType;
     private String homepage;
-    private String schul_code;// 행정표준코드
 
 
     @OneToMany(mappedBy = "school")
