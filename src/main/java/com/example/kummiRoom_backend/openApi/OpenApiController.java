@@ -29,12 +29,11 @@ public class OpenApiController {
     }
 
     @PostMapping("/load-school")
-    public void getSchool(@RequestBody GetSchoolRequestDto request) throws Exception {
-        openApiService.getSchoolTable(request);
-//        try {
-//            return ResponseEntity.ok(openApiService.getSchoolTable(request));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
+    public ResponseEntity<?> getSchool(@RequestBody GetSchoolRequestDto request) throws Exception {
+        try {
+            return ResponseEntity.ok(openApiService.getSchoolTable(request));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }

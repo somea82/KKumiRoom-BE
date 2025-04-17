@@ -77,7 +77,7 @@ public class OpenApiService {
         }
     }
 
-    public void getSchoolTable(GetSchoolRequestDto req) throws Exception {
+    public List<School> getSchoolTable(GetSchoolRequestDto req) throws Exception {
 
         //demo 버전 : url은 하드 코딩 된 상태 ( 서울시 고등학교 기준 )
         String url = getSchoolBaseUrl
@@ -108,49 +108,47 @@ public class OpenApiService {
 
             if (rowArray.isArray()) {
                 //저장 함수
-                saveSchoolsFromApi(rowArray);
+                return saveSchoolsFromApi(rowArray);
             }
 
+        }
+        throw new RuntimeException("NEIS API 호출 실패");
+    }
+
+public List<School> saveSchoolsFromApi(JsonNode rowArray) {
+    List<School> schoolEntities = new ArrayList<>();
+
+
+    for (JsonNode node : rowArray) {
+
+        // DB에 이미 있는지 확인
+        Optional<School> existing = schoolRepository.findBySchoolName(node.path("SCHUL_NM").asText());
+        School school = School.builder()
+                .schul_code(node.path("SD_SCHUL_CODE").asText())
+                .schoolName(node.path("SCHUL_NM").asText())
+                .address(node.path("ORG_RDNMA").asText())
+                .eduId(node.path("ATPT_OFCDC_SC_CODE").asText())
+                .schoolType(node.path("SCHUL_KND_SC_NM").asText())
+                .homepage(node.path("HMPG_ADRES").asText())
+                .build();
+
+        if (existing.isPresent()) {
+            // 업데이트 로직: 필드 덮어쓰기 또는 유지
+            School existSchool = existing.get();
+            existSchool.setSchoolName(school.getSchoolName());
+            existSchool.setAddress(school.getAddress());
+            existSchool.setEduId(school.getEduId());
+            existSchool.setSchoolType(school.getSchoolType());
+            existSchool.setHomepage(school.getHomepage());
+            schoolEntities.add(existSchool);
         } else {
-            throw new RuntimeException("NEIS API 호출 실패");
+            // 신규 등록
+            schoolEntities.add(school);
         }
     }
+    System.out.println("[DEBUG] saveSchoolsFromApi: " + schoolEntities);
 
-    public void saveSchoolsFromApi(JsonNode rowArray) {
-        List<School> schoolEntities = new ArrayList<>();
-
-
-        for (JsonNode node : rowArray) {
-            String schoolId = node.path("SD_SCHUL_CODE").asText();
-
-            // DB에 이미 있는지 확인
-            Optional<School> existing = schoolRepository.findById(schoolId);
-            School school = School.builder()
-                    .schul_code(node.path("SCHUL_KND_SC_NM").asText())
-                    .schoolName(node.path("SCHUL_NM").asText())
-                    .address(node.path("ORG_RDNMA").asText())
-                    .eduId(node.path("ATPT_OFCDC_SC_CODE").asText())
-                    .schoolType(node.path("SCHUL_KND_SC_NM").asText())
-                    .homepage(node.path("HMPG_ADRES").asText())
-                    .build();
-
-            if (existing.isPresent()) {
-                // 업데이트 로직: 필드 덮어쓰기 또는 유지
-                School existSchool = existing.get();
-                existSchool.setSchoolName(school.getSchoolName());
-                existSchool.setAddress(school.getAddress());
-                existSchool.setEduId(school.getEduId());
-                existSchool.setSchoolType(school.getSchoolType());
-                existSchool.setHomepage(school.getHomepage());
-                schoolEntities.add(existSchool);
-            } else {
-                // 신규 등록
-                schoolEntities.add(school);
-            }
-        }
-        System.out.println("[DEBUG] saveSchoolsFromApi: " + schoolEntities);
-
-        schoolRepository.saveAll(schoolEntities);
-    }
+    return schoolRepository.saveAll(schoolEntities);
+}
 
 }
