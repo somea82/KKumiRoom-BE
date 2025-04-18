@@ -3,6 +3,7 @@ package com.example.kummiRoom_backend.api.service;
 import com.example.kummiRoom_backend.api.dto.responseDto.CourseResponseDto;
 import com.example.kummiRoom_backend.api.entity.Course;
 import com.example.kummiRoom_backend.api.repository.CourseRepository;
+import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,20 @@ public class CourseService {
                         .createdAt(course.getCreatedAt())
                         .build()
                 ).collect(Collectors.toList());
+    }
+
+    public CourseResponseDto getCourseBySchoolIdAndCourseId(Long schoolId, Long courseId) {
+        Course course = courseRepository.findBySchool_SchoolIdAndCourseId(schoolId, courseId)
+                .orElseThrow(() -> new NotFoundException("해당 과목을 찾을 수 없습니다."));
+
+        return CourseResponseDto.builder()
+                .courseId(course.getCourseId())
+                .courseName(course.getCourseName())
+                .courseArea(course.getCourseArea())
+                .semester(course.getSemester())
+                .description(course.getDescription())
+                .maxStudents(course.getMaxStudents())
+                .createdAt(course.getCreatedAt())
+                .build();
     }
 }

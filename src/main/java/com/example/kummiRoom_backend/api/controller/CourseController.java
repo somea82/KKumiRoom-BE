@@ -17,8 +17,15 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<?> getCoursesBySchool(@RequestParam("course_id") Long schoolId) {
+    public ResponseEntity<?> getCoursesBySchool(@RequestParam("school_id") Long schoolId) {
         List<CourseResponseDto> response = courseService.getCoursesBySchoolId(schoolId);
         return ResponseEntity.ok(new ApiResult(200,"OK","학교 정보 조회에 성공하였습니다.",response));
+    }
+
+    @GetMapping("/{course_id}")
+    public ResponseEntity<?> getCourseDetailById(@RequestParam("school_id") Long schoolId,
+                                                 @PathVariable("course_id") Long courseId) {
+        CourseResponseDto response = courseService.getCourseBySchoolIdAndCourseId(schoolId, courseId);
+        return ResponseEntity.ok(new ApiResult(200, "OK", "과목 상세 조회에 성공하였습니다.", response));
     }
 }
