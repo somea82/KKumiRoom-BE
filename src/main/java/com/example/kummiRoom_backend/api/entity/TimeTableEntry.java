@@ -11,8 +11,8 @@ public class TimeTableEntry {
     private Long entryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "timetable_id")
-    private TimeTable timetable;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
@@ -20,4 +20,5 @@ public class TimeTableEntry {
 
     private Integer period;
     private String day;
+    private Integer semester;
 }
