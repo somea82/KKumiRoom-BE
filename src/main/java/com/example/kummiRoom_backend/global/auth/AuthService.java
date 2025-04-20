@@ -86,6 +86,9 @@ public class AuthService {
                     .authId(request.getAuthId())
                     .userName(request.getName())
                     .school(schoolRepository.findBySchoolId(request.getSchoolId()))
+                    .address(request.getAddress())
+                    .phone(request.getPhone())
+                    .birth(request.getBirth())
                     .password(CryptoUtil.encrypt(request.getPassword())) // 암호화 후 저장
                     .build();
 

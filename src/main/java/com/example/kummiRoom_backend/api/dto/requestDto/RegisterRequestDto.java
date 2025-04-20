@@ -2,6 +2,8 @@ package com.example.kummiRoom_backend.api.dto.requestDto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Builder
@@ -12,6 +14,9 @@ public class RegisterRequestDto {
     private String password;
     private String name;
     private Long schoolId;
+    private String address;
+    private String phone;
+    private LocalDate birth;
     private Integer grade;
     private Integer classNumber;
 }
