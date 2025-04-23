@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 public class Major {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long MajorId;
+    private Long majorId;
 
-    private String name; // 학과 이름
+    private String majorName; // 학과 이름
 
-    private String courseArea; // 계열 예) 사회과학 계열
+    private String majorArea; // 계열 예) 사회과학 계열
 
     private String description;
     private String relatedMajors;
