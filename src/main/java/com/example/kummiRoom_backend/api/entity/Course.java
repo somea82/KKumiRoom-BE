@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Builder
@@ -36,4 +37,8 @@ public class Course {
     private Integer maxStudents;
 
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "course")
+    @JsonIgnore
+    private List<TimeTable> timeTables;
 }

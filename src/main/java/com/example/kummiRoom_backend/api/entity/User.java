@@ -1,5 +1,6 @@
 package com.example.kummiRoom_backend.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -32,4 +34,8 @@ public class User {
     private String address;
     private String phone;
     private LocalDate birth;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<TimeTable> timeTables;
 }

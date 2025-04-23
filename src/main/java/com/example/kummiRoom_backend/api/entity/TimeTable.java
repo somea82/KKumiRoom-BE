@@ -1,8 +1,16 @@
 package com.example.kummiRoom_backend.api.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Table(name = "timetable")
 public class TimeTable {
 
@@ -11,14 +19,15 @@ public class TimeTable {
     private Long entryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
     private Course course;
 
     private Integer period;
-    private String day;
+
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek day; // enum 적용됨
+
     private String semester;
 }
