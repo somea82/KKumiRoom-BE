@@ -38,4 +38,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<TimeTable> timeTables;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "major_id")
+    private Major interestMajor;
 }
