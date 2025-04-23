@@ -45,7 +45,7 @@ public class OpenApiService {
                 .queryParam("Type", "json")
                 .queryParam("ATPT_OFCDC_SC_CODE", req.getAtptOfcdcScCode())
                 .queryParam("SD_SCHUL_CODE", req.getSdSchulCode())
-                .queryParam("TI_FROM_YMD","20250401")
+                .queryParam("TI_FROM_YMD", "20250401")
                 .toUriString();
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -79,10 +79,11 @@ public class OpenApiService {
                     Course course = Course.builder()
                             .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
                             .courseName(courseName)
+                            .courseType("공통")
                             .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
-                            .semester(node.path("AY").asText()) // 학년도
+                            .semester(node.path("GRADE").asText() + "학년" + " " + node.path("SEM").asText() + "학기") //  예: 1학년 1학기
                             .description(node.path("DGHT_CRSE_SC_NM").asText() + " " + node.path("GRADE").asText() + "학년") // 예: 주간 1학년
-                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
                             .maxStudents(0) // 임의 초기값
                             .build();
                     System.out.println(course);
@@ -133,40 +134,40 @@ public class OpenApiService {
         throw new RuntimeException("NEIS API 호출 실패");
     }
 
-public List<School> saveSchoolsFromApi(JsonNode rowArray) {
-    List<School> schoolEntities = new ArrayList<>();
+    public List<School> saveSchoolsFromApi(JsonNode rowArray) {
+        List<School> schoolEntities = new ArrayList<>();
 
 
-    for (JsonNode node : rowArray) {
+        for (JsonNode node : rowArray) {
 
-        // DB에 이미 있는지 확인
-        Optional<School> existing = schoolRepository.findBySchoolName(node.path("SCHUL_NM").asText());
-        School school = School.builder()
-                .schoolId(Long.valueOf(node.path("SD_SCHUL_CODE").asText()))
-                .schoolName(node.path("SCHUL_NM").asText())
-                .address(node.path("ORG_RDNMA").asText())
-                .eduId(node.path("ATPT_OFCDC_SC_CODE").asText())
-                .schoolType(node.path("SCHUL_KND_SC_NM").asText())
-                .homepage(node.path("HMPG_ADRES").asText())
-                .build();
+            // DB에 이미 있는지 확인
+            Optional<School> existing = schoolRepository.findBySchoolName(node.path("SCHUL_NM").asText());
+            School school = School.builder()
+                    .schoolId(Long.valueOf(node.path("SD_SCHUL_CODE").asText()))
+                    .schoolName(node.path("SCHUL_NM").asText())
+                    .address(node.path("ORG_RDNMA").asText())
+                    .eduId(node.path("ATPT_OFCDC_SC_CODE").asText())
+                    .schoolType(node.path("SCHUL_KND_SC_NM").asText())
+                    .homepage(node.path("HMPG_ADRES").asText())
+                    .build();
 
-        if (existing.isPresent()) {
-            // 업데이트 로직: 필드 덮어쓰기 또는 유지
-            School existSchool = existing.get();
-            existSchool.setSchoolName(school.getSchoolName());
-            existSchool.setAddress(school.getAddress());
-            existSchool.setEduId(school.getEduId());
-            existSchool.setSchoolType(school.getSchoolType());
-            existSchool.setHomepage(school.getHomepage());
-            schoolEntities.add(existSchool);
-        } else {
-            // 신규 등록
-            schoolEntities.add(school);
+            if (existing.isPresent()) {
+                // 업데이트 로직: 필드 덮어쓰기 또는 유지
+                School existSchool = existing.get();
+                existSchool.setSchoolName(school.getSchoolName());
+                existSchool.setAddress(school.getAddress());
+                existSchool.setEduId(school.getEduId());
+                existSchool.setSchoolType(school.getSchoolType());
+                existSchool.setHomepage(school.getHomepage());
+                schoolEntities.add(existSchool);
+            } else {
+                // 신규 등록
+                schoolEntities.add(school);
+            }
         }
-    }
-    System.out.println("[DEBUG] saveSchoolsFromApi: " + schoolEntities);
+        System.out.println("[DEBUG] saveSchoolsFromApi: " + schoolEntities);
 
-    return schoolRepository.saveAll(schoolEntities);
-}
+        return schoolRepository.saveAll(schoolEntities);
+    }
 
 }

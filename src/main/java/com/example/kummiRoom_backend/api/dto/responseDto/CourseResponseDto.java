@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class CourseResponseDto {
     private Long courseId;
     private String courseName;
+    private String courseType;
     private String courseArea;
     private String semester;
     private String description;

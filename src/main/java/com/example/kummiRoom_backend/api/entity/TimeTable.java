@@ -3,8 +3,8 @@ package com.example.kummiRoom_backend.api.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "timetable_entry")
-public class TimeTableEntry {
+@Table(name = "timetable")
+public class TimeTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +20,5 @@ public class TimeTableEntry {
 
     private Integer period;
     private String day;
-    private Integer semester;
+    private String semester;
 }

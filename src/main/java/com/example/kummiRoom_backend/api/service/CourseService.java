@@ -23,11 +23,12 @@ public class CourseService {
                 .map(course -> CourseResponseDto.builder()
                         .courseId(course.getCourseId())
                         .courseName(course.getCourseName())
+                        .courseType(course.getCourseType())
                         .courseArea(course.getCourseArea())
                         .semester(course.getSemester())
                         .description(course.getDescription())
                         .maxStudents(course.getMaxStudents())
-                        .createdAt(course.getCreatedAt())
+                        .createdAt(course.getUpdatedAt())
                         .build()
                 ).collect(Collectors.toList());
     }
@@ -43,7 +44,7 @@ public class CourseService {
                 .semester(course.getSemester())
                 .description(course.getDescription())
                 .maxStudents(course.getMaxStudents())
-                .createdAt(course.getCreatedAt())
+                .createdAt(course.getUpdatedAt())
                 .build();
     }
 }

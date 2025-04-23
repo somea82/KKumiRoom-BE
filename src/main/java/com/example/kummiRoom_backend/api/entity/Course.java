@@ -27,11 +27,13 @@ public class Course {
     private School school;
 
     private String courseName;
+    //todo 공통 or 선택과목 수정예정
+    private String courseType;
     private String courseArea;
     private String semester;
     private String description;
 
     private Integer maxStudents;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
