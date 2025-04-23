@@ -1,7 +1,10 @@
 package com.example.kummiRoom_backend.api.service;
 
 import com.example.kummiRoom_backend.api.dto.responseDto.MajorByAreaResponseDto;
+import com.example.kummiRoom_backend.api.dto.responseDto.MajorDetailResponseDto;
+import com.example.kummiRoom_backend.api.entity.Major;
 import com.example.kummiRoom_backend.api.repository.MajorRepository;
+import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +23,9 @@ public class MajorService {
                 .collect(Collectors.toList());
     }
 
-//    public CourseDetailDto getCourseDetail(Long courseId) {
-//        Course course = courseRepository.findById(courseId)
-//                .orElseThrow(() -> new NotFoundException("해당 학과를 찾을 수 없습니다."));
-//        return CourseDetailDto.from(course);
-//    }
+    public MajorDetailResponseDto getMajorDetail(Long majorId) {
+        Major major = majorRepository.findById(majorId)
+                .orElseThrow(() -> new NotFoundException("해당 학과를 찾을 수 없습니다."));
+        return MajorDetailResponseDto.from(major);
+    }
 }
