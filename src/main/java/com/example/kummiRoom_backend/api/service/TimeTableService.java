@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,15 +31,23 @@ public class TimeTableService {
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new NotFoundException("과목을 찾을 수 없습니다."));
 
-        TimeTable timeTable = TimeTable.builder()
-                .user(user)
-                .course(course)
-                .period(request.getPeriod())
-                .day(request.getDay())
-                .semester(course.getSemester())
-                .build();
+        Optional<TimeTable> existingTimeTable = timeTableRepository.findByUserAndDayAndPeriodAndSemester(user, request.getDay(), request.getPeriod(),request.getSemester());
 
-        timeTableRepository.save(timeTable);
+        // 추가) 이미 존재하면 업데이트
+        if (existingTimeTable.isPresent()) {
+            TimeTable timeTable = existingTimeTable.get();
+            timeTable.setCourse(course);
+            timeTableRepository.save(timeTable);
+        } else {
+            TimeTable timeTable = TimeTable.builder()
+                    .user(user)
+                    .course(course)
+                    .period(request.getPeriod())
+                    .day(request.getDay())
+                    .semester(course.getSemester())
+                    .build();
+            timeTableRepository.save(timeTable);
+        }
     }
 
     public List<TimeTableResponseDto> getTimeTablesByUserId(Long userId) {

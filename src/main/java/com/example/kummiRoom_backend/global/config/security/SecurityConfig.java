@@ -22,63 +22,64 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final JwtService jwtService;
-	private final RedisService redisService;
-	private final AuthService authService;
+    private final JwtService jwtService;
+    private final RedisService redisService;
+    private final AuthService authService;
 
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtService, redisService, authService);
-	}
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, redisService, authService);
+    }
 
-	//
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-			.csrf(csrf -> csrf.disable())
-			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-			.sessionManagement(session -> session
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			)
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(
-					"/api/openapi/**",
-					"/v3/api-docs/**"
-				)
-				.permitAll()
-				.requestMatchers("/actuator/**", "/actuator")
-				.permitAll() // 인증이 필요하지 않은 Actuator 엔드포인트, 그러나 상세 정보를 보려면 인증 필요
-				// .requestMatchers("/actuator/**").authenticated() // 인증이 필요한 Actuator 엔드포인트
-				.requestMatchers(
-					"/",
-					"/api/auth/sign-in",
-					"/api/auth/sign-up",
-					"/api/cert/**"
-				)
-				.permitAll()
-				.anyRequest()
-				.authenticated()
-			)
-			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    //
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/openapi/**",
+                                "/api/auth/sign-out",
+                                "/v3/api-docs/**"
+                        )
+                        .permitAll()
+                        .requestMatchers("/actuator/**", "/actuator")
+                        .permitAll() // 인증이 필요하지 않은 Actuator 엔드포인트, 그러나 상세 정보를 보려면 인증 필요
+                        // .requestMatchers("/actuator/**").authenticated() // 인증이 필요한 Actuator 엔드포인트
+                        .requestMatchers(
+                                "/",
+                                "/api/auth/sign-in",
+                                "/api/auth/sign-up",
+                                "/api/cert/**"
+                        )
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated()
+                )
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-		return http.build();
-	}
+        return http.build();
+    }
 
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		// "*" 대신 구체적인 출처 지정
-		configuration.setAllowedOrigins(List.of(
-			"http://127.0.0.1", "http://localhost:3000"));
-		configuration.addAllowedMethod("*");
-		configuration.addAllowedHeader("*");
-		configuration.setAllowCredentials(true);  // credentials 활성화
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // "*" 대신 구체적인 출처 지정
+        configuration.setAllowedOrigins(List.of(
+                "http://127.0.0.1", "http://localhost:3000"));
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);  // credentials 활성화
 
-		configuration.addExposedHeader("Authorization");
+        configuration.addExposedHeader("Authorization");
 
-		configuration.addExposedHeader("Set-Cookie");
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+        configuration.addExposedHeader("Set-Cookie");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

@@ -27,7 +27,7 @@ public class TimeTable {
     private Integer period;
 
     @Enumerated(EnumType.STRING)
-    private DayOfWeek day; // enum 적용됨
+    private DayOfWeek day;
 
     private String semester;
 }
