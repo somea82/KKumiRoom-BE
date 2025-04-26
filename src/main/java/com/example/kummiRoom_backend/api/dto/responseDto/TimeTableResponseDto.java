@@ -11,6 +11,7 @@ import lombok.Getter;
 public class TimeTableResponseDto {
     private Long courseId;
     private String courseName;
+    private String courseType;
     private Integer period;
     private DayOfWeek day;
     private String semester;
