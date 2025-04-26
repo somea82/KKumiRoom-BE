@@ -80,6 +80,7 @@ public class AuthService {
             if (existingUser.isPresent()) {
                 throw new BadRequestException("이미 가입된 사용자 입니다.");
             }
+            String formattedPhone = request.getPhone().replaceAll("-", "");
 
             // 새로운 사용자 생성
             User newUser = User.builder()
@@ -87,7 +88,9 @@ public class AuthService {
                     .userName(request.getName())
                     .school(schoolRepository.findBySchoolId(request.getSchoolId()))
                     .address(request.getAddress())
-                    .phone(request.getPhone())
+                    .grade(request.getGrade())
+                    .classNum(request.getClassNumber())
+                    .phone(formattedPhone)
                     .birth(request.getBirth())
                     .password(CryptoUtil.encrypt(request.getPassword())) // 암호화 후 저장
                     .build();
@@ -158,6 +161,7 @@ public class AuthService {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().trim().equals(cookieName.trim())) {
+                    System.out.println(cookie.getValue());
                     return cookie.getValue();
                 }
 

@@ -16,7 +16,7 @@ public class RegisterRequestDto {
     private Long schoolId;
     private String address;
     private String phone;
-    private LocalDate birth;
     private Integer grade;
+    private LocalDate birth;
     private Integer classNumber;
 }
