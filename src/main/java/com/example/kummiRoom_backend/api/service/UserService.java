@@ -1,10 +1,12 @@
 package com.example.kummiRoom_backend.api.service;
 
+import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.SchoolDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.UserProfileResponseDto;
 import com.example.kummiRoom_backend.api.entity.Major;
 import com.example.kummiRoom_backend.api.entity.School;
 import com.example.kummiRoom_backend.api.entity.User;
+import com.example.kummiRoom_backend.api.repository.MajorRepository;
 import com.example.kummiRoom_backend.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final MajorRepository majorRepository;
 
     public UserProfileResponseDto getMyProfile(Long userId) {
         User user = userRepository.findById(userId)
@@ -26,7 +29,7 @@ public class UserService {
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .address(user.getAddress())
-                .interestMajor(major != null ? major.getMajorName() : null)
+                .interestMajor(major != null ? major.getMajorId() : null)
                 .grade(user.getGrade())
                 .classNum(user.getClassNum())
                 .school(SchoolDto.builder()
@@ -35,5 +38,16 @@ public class UserService {
                         .homepage(school.getHomepage())
                         .build())
                 .build();
+    }
+
+    public void addMajor(AddMajorRequestDto dto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+        Major major = majorRepository.findByMajorName(dto.getMajorName())
+                .orElseThrow(() -> new IllegalArgumentException("해당 전공을 찾을 수 없습니다."));
+
+        user.setInterestMajor(major);
+        userRepository.save(user);
     }
 }

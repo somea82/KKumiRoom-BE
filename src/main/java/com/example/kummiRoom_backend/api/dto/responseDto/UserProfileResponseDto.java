@@ -16,7 +16,7 @@ public class UserProfileResponseDto {
     private LocalDate birth;
     private String phone;
     private String address;
-    private String interestMajor;
+    private Long interestMajor;
     private Integer grade;
     private Integer classNum;
     private SchoolDto school;

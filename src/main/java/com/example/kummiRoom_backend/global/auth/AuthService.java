@@ -161,7 +161,6 @@ public class AuthService {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().trim().equals(cookieName.trim())) {
-                    System.out.println(cookie.getValue());
                     return cookie.getValue();
                 }
 
