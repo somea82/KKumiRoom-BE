@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/openapi/timeTable")
+@RequestMapping("/api/timeTable")
 public class TimeTableController {
     private final TimeTableService timeTableService;
     private final JwtService jwtService;

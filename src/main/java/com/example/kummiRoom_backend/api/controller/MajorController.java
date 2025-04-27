@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/openapi/major")
+@RequestMapping("/api/major")
 @RequiredArgsConstructor
 public class MajorController {
 
