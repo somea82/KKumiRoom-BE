@@ -53,6 +53,7 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
+        System.out.println(">>> secretKey = " + secret.getBytes()); // 추가
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -94,14 +95,20 @@ public class JwtService {
     }
 
     public String extractAuthId(String token) {
+        System.out.println(extractAllClaims(token).getSubject());
         return extractAllClaims(token).getSubject();
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }catch (Exception e){
+            e.printStackTrace(); // 여기에 실제 에러 로그가 찍힐거야
+            throw e;
+        }
     }
 }

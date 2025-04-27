@@ -65,6 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			// JWT 유효성 검사
 			final String userId = jwtService.extractAuthId(accessToken);
+			System.out.println(userId);
 
 			if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				if (jwtService.isValidToken(accessToken)) {
