@@ -41,9 +41,16 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<?> getCourseDetailById(@RequestParam("schoolId") Long schoolId,
-                                                 @PathVariable("courseId") Long courseId) {
-        CourseResponseDto response = courseService.getCourseBySchoolIdAndCourseId(schoolId, courseId);
+    public ResponseEntity<?> getCourseDetailById(HttpServletRequest request, @PathVariable("courseId") Long courseId) {
+        String accessToken = authService.getCookieValue(request, "accessToken");
+        if(accessToken == null){
+            throw new UnauthorizedException("액세스 토큰이 없습니다");
+        }
+        Long userId = jwtService.extractUserId(accessToken);
+
+        Optional<User> user = userRepository.findById(userId);
+
+        CourseResponseDto response = courseService.getCourseBySchoolIdAndCourseId(user.get().getSchool().getSchoolId(), courseId);
         return ResponseEntity.ok(new ApiResult(200, "OK", "과목 상세 조회에 성공하였습니다.", response));
     }
 }
