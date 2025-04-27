@@ -13,10 +13,11 @@ import java.time.LocalDate;
 @Builder
 public class UserProfileResponseDto {
     private Long userId;
+    private String username;
     private LocalDate birth;
     private String phone;
     private String address;
-    private Long interestMajor;
+    private MajorDto interestMajor;
     private Integer grade;
     private Integer classNum;
     private SchoolDto school;

@@ -1,6 +1,7 @@
 package com.example.kummiRoom_backend.api.service;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
+import com.example.kummiRoom_backend.api.dto.responseDto.MajorDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.SchoolDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.UserProfileResponseDto;
 import com.example.kummiRoom_backend.api.entity.Major;
@@ -23,13 +24,19 @@ public class UserService {
 
         School school = user.getSchool();
         Major major = user.getInterestMajor();
+        MajorDto majorDto = MajorDto.builder()
+                .majorId(major.getMajorId())
+                .majorName(major.getMajorName())
+                .description(major.getDescription())
+                .recommendedCourses(major.getRecommendedCourses()).build();
 
         return UserProfileResponseDto.builder()
                 .userId(user.getUserId())
+                .username(user.getUserName())
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .address(user.getAddress())
-                .interestMajor(major != null ? major.getMajorId() : null)
+                .interestMajor(major != null ? majorDto : null)
                 .grade(user.getGrade())
                 .classNum(user.getClassNum())
                 .school(SchoolDto.builder()
