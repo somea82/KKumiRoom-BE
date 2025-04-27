@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class TimeTableDeleteRequestDto {
     private DayOfWeek day;
     private Integer period;
+    private String semester;
 }

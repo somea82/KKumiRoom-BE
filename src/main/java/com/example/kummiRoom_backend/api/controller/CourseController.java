@@ -37,7 +37,7 @@ public class CourseController {
         Optional<User> user = userRepository.findById(userId);
 
         List<CourseResponseDto> response = courseService.getCoursesBySchoolId(user.get().getSchool().getSchoolId());
-        return ResponseEntity.ok(new ApiResult(200,"OK","학교 정보 조회에 성공하였습니다.",response));
+        return ResponseEntity.ok(new ApiResult(200,"OK","학교수업 정보 조회에 성공하였습니다.",response));
     }
 
     @GetMapping("/{courseId}")
