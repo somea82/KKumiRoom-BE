@@ -1,6 +1,7 @@
 package com.example.kummiRoom_backend.api.service;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.MajorDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.SchoolDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.UserProfileResponseDto;
@@ -9,6 +10,7 @@ import com.example.kummiRoom_backend.api.entity.School;
 import com.example.kummiRoom_backend.api.entity.User;
 import com.example.kummiRoom_backend.api.repository.MajorRepository;
 import com.example.kummiRoom_backend.api.repository.UserRepository;
+import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,8 @@ public class UserService {
                 .build();
     }
 
+
+
     public void addMajor(AddMajorRequestDto dto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
@@ -55,6 +59,16 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 전공을 찾을 수 없습니다."));
 
         user.setInterestMajor(major);
+        userRepository.save(user);
+    }
+
+    public void updateAddressAndPhone(Long userId, UpdateProfileRequestDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
+
         userRepository.save(user);
     }
 }
