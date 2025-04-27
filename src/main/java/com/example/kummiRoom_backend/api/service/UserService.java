@@ -32,7 +32,7 @@ public class UserService {
 
         return UserProfileResponseDto.builder()
                 .userId(user.getUserId())
-                .username(user.getUserName())
+                .userName(user.getUserName())
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .address(user.getAddress())
