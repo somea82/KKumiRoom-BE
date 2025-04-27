@@ -26,11 +26,15 @@ public class UserService {
 
         School school = user.getSchool();
         Major major = user.getInterestMajor();
-        MajorDto majorDto = MajorDto.builder()
-                .majorId(major.getMajorId())
-                .majorName(major.getMajorName())
-                .description(major.getDescription())
-                .recommendedCourses(major.getRecommendedCourses()).build();
+        MajorDto majorDto = null;
+        if (major != null) {
+            majorDto = MajorDto.builder()
+                    .majorId(major.getMajorId())
+                    .majorName(major.getMajorName())
+                    .description(major.getDescription())
+                    .recommendedCourses(major.getRecommendedCourses())
+                    .build();
+        }
 
         return UserProfileResponseDto.builder()
                 .userId(user.getUserId())
@@ -38,7 +42,7 @@ public class UserService {
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .address(user.getAddress())
-                .interestMajor(major != null ? majorDto : null)
+                .interestMajor(majorDto)  // 여기서 안전하게 null 또는 값 세팅
                 .grade(user.getGrade())
                 .classNum(user.getClassNum())
                 .school(SchoolDto.builder()
