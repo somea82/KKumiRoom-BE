@@ -28,6 +28,4 @@ public class TimeTable {
 
     @Enumerated(EnumType.STRING)
     private DayOfWeek day;
-
-    private String semester;
 }

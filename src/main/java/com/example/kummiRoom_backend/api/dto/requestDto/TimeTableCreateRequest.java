@@ -8,5 +8,4 @@ public class TimeTableCreateRequest {
     private Long courseId;
     private Integer period;
     private DayOfWeek day;
-    private String semester;
 }

@@ -31,7 +31,7 @@ public class TimeTableService {
         Course course = courseRepository.findById(dto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("과목을 찾을 수 없습니다."));
 
-        Optional<TimeTable> existingTimeTable = timeTableRepository.findByUserAndDayAndPeriodAndSemester(user, dto.getDay(), dto.getPeriod(),dto.getSemester());
+        Optional<TimeTable> existingTimeTable = timeTableRepository.findByUserAndDayAndPeriod(user, dto.getDay(), dto.getPeriod());
 
         // 추가) 이미 존재하면 업데이트
         if (existingTimeTable.isPresent()) {
@@ -44,7 +44,6 @@ public class TimeTableService {
                     .course(course)
                     .period(dto.getPeriod())
                     .day(dto.getDay())
-                    .semester(course.getSemester())
                     .build();
             timeTableRepository.save(timeTable);
         }
@@ -57,7 +56,6 @@ public class TimeTableService {
                         .courseName(tt.getCourse().getCourseName())
                         .courseType(tt.getCourse().getCourseType())
                         .period(tt.getPeriod())
-                        .semester(tt.getSemester())
                         .day(tt.getDay())
                         .build())
                 .collect(Collectors.toList());
@@ -68,8 +66,7 @@ public class TimeTableService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
-        // userId + 요일 + 교시 + 학기로 TimeTable 조회
-        TimeTable timeTable = timeTableRepository.findByUserAndDayAndPeriodAndSemester(user, dto.getDay(), dto.getPeriod(),dto.getSemester())
+        TimeTable timeTable = timeTableRepository.findByUserAndDayAndPeriod(user, dto.getDay(), dto.getPeriod())
                 .orElseThrow(() -> new NotFoundException("해당하는 시간표를 찾을 수 없습니다."));
 
         timeTableRepository.delete(timeTable);

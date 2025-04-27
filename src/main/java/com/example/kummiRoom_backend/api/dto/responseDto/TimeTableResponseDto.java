@@ -14,5 +14,4 @@ public class TimeTableResponseDto {
     private String courseType;
     private Integer period;
     private DayOfWeek day;
-    private String semester;
 }
