@@ -39,63 +39,68 @@ public class OpenApiService {
 
 
     public List<Course> getCourseFromTimeTable(NeisTimetableRequestDto req) throws Exception {
-
-        String url = UriComponentsBuilder.fromHttpUrl(testBaseUrl)
-                .queryParam("KEY", openApiKey)
-                .queryParam("Type", "json")
-                .queryParam("ATPT_OFCDC_SC_CODE", req.getAtptOfcdcScCode())
-                .queryParam("SD_SCHUL_CODE", req.getSdSchulCode())
-                .queryParam("TI_FROM_YMD", "20250401")
-                .toUriString();
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                String.class
-        );
-        System.out.println("[DEBUG] NEIS 요청: " + url);
-        System.out.println("[DEBUG] NEIS 응답: " + response.getBody());
-
         Set<String> courseNameSet = new HashSet<>();
         List<Course> courseList = new ArrayList<>();
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.getBody());
 
-            JsonNode rowArray = root.path("hisTimetable").get(1).path("row");
-            System.out.println("[DEBUG] JSON 응답: " + rowArray);
+        for (int i = 1; i <= 2; i++) { // pindex 1과 2 두 번 반복
+            String url = UriComponentsBuilder.fromHttpUrl(testBaseUrl)
+                    .queryParam("KEY", openApiKey)
+                    .queryParam("Type", "json")
+                    .queryParam("ATPT_OFCDC_SC_CODE", req.getAtptOfcdcScCode())
+                    .queryParam("SD_SCHUL_CODE", req.getSdSchulCode())
+                    .queryParam("TI_FROM_YMD", "20250407")
+                    .queryParam("TI_TO_YMD", "20250411")
+                    .queryParam("pSize", "750")
+                    .queryParam("pindex", i)
+                    .toUriString();
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    String.class
+            );
 
 
-            if (rowArray.isArray()) {
-                for (JsonNode node : rowArray) {
-                    String courseName = node.path("ITRT_CNTNT").asText();
+            System.out.println("[DEBUG] NEIS 요청: " + url);
+            System.out.println("[DEBUG] NEIS 응답: " + response.getBody());
 
-                    // 이미 저장된 과목은 스킵
-                    if (courseNameSet.contains(courseName)) continue;
-                    courseNameSet.add(courseName);
-                    System.out.println(courseNameSet);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(response.getBody());
 
-                    Course course = Course.builder()
-                            .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
-                            .courseName(courseName)
-                            .courseType("공통")
-                            .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
-                            .semester(node.path("GRADE").asText() + "학년" + " " + node.path("SEM").asText() + "학기") //  예: 1학년 1학기
-                            .description(node.path("DGHT_CRSE_SC_NM").asText() + " " + node.path("GRADE").asText() + "학년") // 예: 주간 1학년
-                            .updatedAt(LocalDateTime.now())
-                            .maxStudents(0) // 임의 초기값
-                            .build();
-                    System.out.println(course);
-                    courseList.add(course);
+                JsonNode rowArray = root.path("hisTimetable").get(1).path("row");
+                System.out.println("[DEBUG] JSON 응답: " + rowArray);
+
+                if (rowArray.isArray()) {
+                    for (JsonNode node : rowArray) {
+                        String courseName = node.path("ITRT_CNTNT").asText();
+
+                        // 이미 저장된 과목은 스킵
+                        if (courseNameSet.contains(courseName)) continue;
+                        courseNameSet.add(courseName);
+                        System.out.println(courseNameSet);
+
+                        Course course = Course.builder()
+                                .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
+                                .courseName(courseName)
+                                .courseType("공통")
+                                .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
+                                .semester(node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기") // 예: 1학년 1학기
+                                .description(node.path("DGHT_CRSE_SC_NM").asText() + " " + node.path("GRADE").asText() + "학년") // 예: 주간 1학년
+                                .updatedAt(LocalDateTime.now())
+                                .maxStudents(0) // 임의 초기값
+                                .build();
+                        System.out.println(course);
+                        courseList.add(course);
+                    }
                 }
+            } else {
+                throw new RuntimeException("NEIS API 호출 실패");
             }
-
-
-            return courseRepository.saveAll(courseList);
-        } else {
-            throw new RuntimeException("NEIS API 호출 실패");
         }
+
+        return courseRepository.saveAll(courseList);
     }
 
     public List<School> getSchoolTable(GetSchoolRequestDto req) throws Exception {
