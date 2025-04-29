@@ -75,10 +75,12 @@ public class OpenApiService {
                 if (rowArray.isArray()) {
                     for (JsonNode node : rowArray) {
                         String courseName = node.path("ITRT_CNTNT").asText();
+                        String grade = node.path("GRADE").asText(); // 학년 정보
 
-                        // 이미 저장된 과목은 스킵
-                        if (courseNameSet.contains(courseName)) continue;
-                        courseNameSet.add(courseName);
+                        String courseKey = courseName + "_" + grade;
+
+                        if (courseNameSet.contains(courseKey)) continue;
+                        courseNameSet.add(courseKey);
                         System.out.println(courseNameSet);
 
                         Course course = Course.builder()
