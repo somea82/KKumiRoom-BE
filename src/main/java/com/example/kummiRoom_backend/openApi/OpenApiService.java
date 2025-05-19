@@ -34,7 +34,7 @@ public class OpenApiService {
     @Value("https://open.neis.go.kr/hub/schoolInfo")
     private String getSchoolBaseUrl;
 
-    @Value("a3f4664fd08e4aaf8253d94322698bc3")
+    @Value("${openApi.Key}")
     private String openApiKey;
 
 

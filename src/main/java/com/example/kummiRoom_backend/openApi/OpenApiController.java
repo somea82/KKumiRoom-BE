@@ -16,9 +16,6 @@ public class OpenApiController {
     @Value("https://open.neis.go.kr/hub/hisTimetable")
     private String server1BaseUrl;
 
-    @Value("a3f4664fd08e4aaf8253d94322698bc3")
-    private String openApiKey;
-
     @PostMapping("/load-course")
     public ResponseEntity<?> getTimetable(@RequestBody NeisTimetableRequestDto request) {
         try {
