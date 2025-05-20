@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String accessToken = authService.getCookieValue(request, "accessToken");
 
 		// 토큰이 없으면 필터 체인으로 넘어감
-		if (accessToken == null) {
+		if (accessToken == null || accessToken.isEmpty()) {
 			filterChain.doFilter(request, response);
 			return;
 		}
