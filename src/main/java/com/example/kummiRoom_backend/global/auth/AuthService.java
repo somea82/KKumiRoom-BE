@@ -50,11 +50,7 @@ public class AuthService {
             throw new UnauthorizedException("아이디/이메일 또는 비밀번호를 잘못 입력하셨습니다.");
         }
 
-        userRepository.save(user);
-        return AuthResponseDto.builder()
-                .accessToken(jwtService.generateAccessToken(user.getAuthId(), user.getUserId()))
-                .refreshToken(jwtService.generateRefreshToken(user.getAuthId(), user.getUserId()))
-                .build();
+        return generateTokens(user.getAuthId(), user.getUserName(), user.getUserId());
     }
 
     public void register(RegisterRequestDto request) {
