@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -39,8 +40,16 @@ public class OpenApiService {
 
 
     public List<Course> getCourseFromTimeTable(NeisTimetableRequestDto req) throws Exception {
+        Set<String> existingCourseKeys = new HashSet<>();
         Set<String> courseNameSet = new HashSet<>();
         List<Course> courseList = new ArrayList<>();
+
+        // 기존 Course를 한 번에 조회해서 중복 확인용 set 만들기
+        List<Course> existingCourses = courseRepository.findAllBySchool_SchoolId(req.getSdSchulCode());
+        for (Course course : existingCourses) {
+            String key = course.getCourseName() + "_" + course.getSemester();
+            existingCourseKeys.add(key);
+        }
 
         for (int i = 1; i <= 2; i++) { // pindex 1과 2 두 번 반복
             String url = UriComponentsBuilder.fromHttpUrl(testBaseUrl)
@@ -75,10 +84,14 @@ public class OpenApiService {
                 if (rowArray.isArray()) {
                     for (JsonNode node : rowArray) {
                         String courseName = node.path("ITRT_CNTNT").asText();
-                        String grade = node.path("GRADE").asText(); // 학년 정보
+                        String grade = node.path("GRADE").asText();
+                        String semester = node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기";
+                        Long schoolId = node.path("SD_SCHUL_CODE").asLong();
 
                         String courseKey = courseName + "_" + grade;
 
+                        String key = courseName + "_" + semester;
+                        if (existingCourseKeys.contains(key)) continue; // 중복 → 스킵
                         if (courseNameSet.contains(courseKey)) continue;
                         courseNameSet.add(courseKey);
                         System.out.println(courseNameSet);
@@ -89,11 +102,10 @@ public class OpenApiService {
                                 .courseType("공통")
                                 .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
                                 .semester(node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기") // 예: 1학년 1학기
-                                .description(node.path("DGHT_CRSE_SC_NM").asText() + " " + node.path("GRADE").asText() + "학년") // 예: 주간 1학년
+                                .description(node.path("DGHT_CRSE_SC_NM").asText())
                                 .updatedAt(LocalDateTime.now())
                                 .maxStudents(0) // 임의 초기값
                                 .build();
-                        System.out.println(course);
                         courseList.add(course);
                     }
                 }
@@ -101,7 +113,6 @@ public class OpenApiService {
                 throw new RuntimeException("NEIS API 호출 실패");
             }
         }
-
         return courseRepository.saveAll(courseList);
     }
 
@@ -133,7 +144,6 @@ public class OpenApiService {
             System.out.println("[DEBUG] JSON 응답: " + rowArray);
 
             if (rowArray.isArray()) {
-                //저장 함수
                 return saveSchoolsFromApi(rowArray);
             }
 
@@ -172,7 +182,6 @@ public class OpenApiService {
                 schoolEntities.add(school);
             }
         }
-        System.out.println("[DEBUG] saveSchoolsFromApi: " + schoolEntities);
 
         return schoolRepository.saveAll(schoolEntities);
     }

@@ -13,7 +13,7 @@ public class NeisTimetableRequestDto {
     @JsonProperty("ATPT_OFCDC_SC_CODE")
     private String atptOfcdcScCode;
     @JsonProperty("SD_SCHUL_CODE")
-    private String sdSchulCode;
+    private Long sdSchulCode;
 //    private String grade;
 //    private String classNm;
 //    private String ay;

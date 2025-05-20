@@ -15,7 +15,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "course")
+@Table(
+        name = "course",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"school_id", "course_name", "semester"}
+        )
+)
 public class Course {
 
     @Id

@@ -1,4 +1,5 @@
 package com.example.kummiRoom_backend.api.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
