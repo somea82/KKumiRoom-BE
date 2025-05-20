@@ -5,6 +5,8 @@ import com.example.kummiRoom_backend.api.dto.requestDto.RegisterRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.AuthResponseDto;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
+import com.example.kummiRoom_backend.global.auth.JwtService;
+import com.example.kummiRoom_backend.global.auth.RedisService;
 import com.example.kummiRoom_backend.global.exception.BadRequestException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final JwtService jwtService;
+    private final RedisService redisService;
 
     //사용자 로그인
     @PostMapping("/sign-in")
@@ -34,20 +38,30 @@ public class AuthController {
     }
 
     @PostMapping("/sign-out")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        //accessToken 확인
+        String accessToken = authService.getCookieValue(request, "accessToken");
+
+        if(accessToken != null) {
+            try{
+                String authId = jwtService.extractAuthId(accessToken);
+                redisService.deleteRefreshToken(authId); //redis 에서 refresh 토큰 삭제
+            }catch(Exception e) {// 토큰 만료거나 파실 실패한 경우 무시(이미 로그아웃 됨)
+            }
+        }
         // accessToken 삭제
         Cookie accessTokenCookie = new Cookie("accessToken", null);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
-        accessTokenCookie.setMaxAge(60);
+        accessTokenCookie.setMaxAge(0);
 
         // refreshToken 삭제
         Cookie refreshTokenCookie = new Cookie("refreshToken", null);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setMaxAge(60);
+        refreshTokenCookie.setMaxAge(0);
 
         // 쿠키 두 개 모두 응답에 추가
         response.addCookie(accessTokenCookie);
