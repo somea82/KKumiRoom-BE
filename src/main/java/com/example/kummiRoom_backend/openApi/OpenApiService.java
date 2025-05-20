@@ -144,7 +144,6 @@ public class OpenApiService {
             System.out.println("[DEBUG] JSON 응답: " + rowArray);
 
             if (rowArray.isArray()) {
-                //저장 함수
                 return saveSchoolsFromApi(rowArray);
             }
 
