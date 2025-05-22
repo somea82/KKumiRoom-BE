@@ -39,10 +39,50 @@ public class OpenApiService {
     private String openApiKey;
 
 
+    public List<School> getSchoolTable(GetSchoolRequestDto req) throws Exception {
+
+        //demo 버전 : url은 하드 코딩 된 상태 ( 서울시 고등학교 기준 )
+        String url = getSchoolBaseUrl
+                + "?KEY=" + openApiKey
+                + "&Type=json"
+                + "&ATPT_OFCDC_SC_CODE=" + req.getAtptOfcdcScCode()
+                + "&SCHUL_KND_SC_NM=고등학교"
+                + "&pSize=400";
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                String.class
+        );
+        System.out.println("[DEBUG] getSchool 요청: " + url);
+        System.out.println("[DEBUG] getSchool 응답: " + response.getBody());
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+
+            JsonNode rowArray = root.path("schoolInfo").get(1).path("row");
+            System.out.println("[DEBUG] JSON 응답: " + rowArray);
+
+            if (rowArray.isArray()) {
+                return saveSchoolsFromApi(rowArray);
+            }
+
+        }
+        throw new RuntimeException("NEIS API 호출 실패");
+    }
+
     public List<Course> getCourseFromTimeTable(NeisTimetableRequestDto req) throws Exception {
         Set<String> existingCourseKeys = new HashSet<>();
         Set<String> courseNameSet = new HashSet<>();
         List<Course> courseList = new ArrayList<>();
+
+        // 필수/선택 판별을 위한 Map
+        Map<String, Set<Long>> gradeToClassSet = new HashMap<>();
+        Map<String, Set<Long>> courseToClassSet = new HashMap<>();
+        Map<String, JsonNode> courseToNodeMap = new HashMap<>();
 
         // 기존 Course를 한 번에 조회해서 중복 확인용 set 만들기
         List<Course> existingCourses = courseRepository.findAllBySchool_SchoolId(req.getSdSchulCode());
@@ -85,70 +125,72 @@ public class OpenApiService {
                     for (JsonNode node : rowArray) {
                         String courseName = node.path("ITRT_CNTNT").asText();
                         String grade = node.path("GRADE").asText();
+                        String className = node.path("ITRT_CNTNT").asText();
                         String semester = node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기";
-                        Long schoolId = node.path("SD_SCHUL_CODE").asLong();
+                        Long classNm = node.path("CLASS_NM").asLong();
 
                         String courseKey = courseName + "_" + grade;
 
                         String key = courseName + "_" + semester;
+
+                        // 반별 과목 개설 정보 수집
+                        gradeToClassSet.computeIfAbsent(grade, k -> new HashSet<>()).add(classNm);
+                        //과목별 개설 반 정보 수집
+                        courseToClassSet.computeIfAbsent(courseKey, k -> new HashSet<>()).add(classNm);
+
+                        if (!courseToNodeMap.containsKey(courseKey)) {
+                            courseToNodeMap.put(courseKey, node);
+                        }
+
+
                         if (existingCourseKeys.contains(key)) continue; // 중복 → 스킵
                         if (courseNameSet.contains(courseKey)) continue;
                         courseNameSet.add(courseKey);
                         System.out.println(courseNameSet);
-
-                        Course course = Course.builder()
-                                .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
-                                .courseName(courseName)
-                                .courseType("공통")
-                                .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
-                                .semester(node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기") // 예: 1학년 1학기
-                                .description(node.path("DGHT_CRSE_SC_NM").asText())
-                                .updatedAt(LocalDateTime.now())
-                                .maxStudents(0) // 임의 초기값
-                                .build();
-                        courseList.add(course);
                     }
                 }
             } else {
                 throw new RuntimeException("NEIS API 호출 실패");
             }
         }
+
+        for (String courseKey : courseNameSet) {
+            JsonNode node = courseToNodeMap.get(courseKey);
+
+            String courseName = node.path("ITRT_CNTNT").asText();
+            String grade = node.path("GRADE").asText();
+            String semester = grade + "학년 " + node.path("SEM").asText() + "학기";
+
+            String courseTcourseTypeype = determineCourseType(courseKey, grade, gradeToClassSet, courseToClassSet);
+
+
+            Course course = Course.builder()
+                    .school(schoolRepository.findBySchoolId(node.path("SD_SCHUL_CODE").asLong()))
+                    .courseName(courseName)
+                    .courseType(courseTcourseTypeype)
+                    .courseArea(node.path("ORD_SC_NM").asText()) // 예: 일반계
+                    .semester(node.path("GRADE").asText() + "학년 " + node.path("SEM").asText() + "학기") // 예: 1학년 1학기
+                    .description(node.path("DGHT_CRSE_SC_NM").asText())
+                    .updatedAt(LocalDateTime.now())
+                    .maxStudents(0) // 임의 초기값
+                    .build();
+            courseList.add(course);
+        }
+
         return courseRepository.saveAll(courseList);
     }
 
-    public List<School> getSchoolTable(GetSchoolRequestDto req) throws Exception {
 
-        //demo 버전 : url은 하드 코딩 된 상태 ( 서울시 고등학교 기준 )
-        String url = getSchoolBaseUrl
-                + "?KEY=" + openApiKey
-                + "&Type=json"
-                + "&ATPT_OFCDC_SC_CODE=" + req.getAtptOfcdcScCode()
-                + "&SCHUL_KND_SC_NM=고등학교"
-                + "&pSize=400";
+    private String determineCourseType(String courseKey, String grade,
+                                       Map<String, Set<Long>> gradeToClassSet,
+                                       Map<String, Set<Long>> courseToClassSet) {
+        Set<Long> allClasses = gradeToClassSet.get(grade);
+        Set<Long> offeringClasses = courseToClassSet.get(courseKey);
 
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                String.class
-        );
-        System.out.println("[DEBUG] getSchool 요청: " + url);
-        System.out.println("[DEBUG] getSchool 응답: " + response.getBody());
-
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.getBody());
-
-            JsonNode rowArray = root.path("schoolInfo").get(1).path("row");
-            System.out.println("[DEBUG] JSON 응답: " + rowArray);
-
-            if (rowArray.isArray()) {
-                return saveSchoolsFromApi(rowArray);
-            }
-
+        if (allClasses != null && offeringClasses != null && allClasses.equals(offeringClasses)) {
+            return "필수";
         }
-        throw new RuntimeException("NEIS API 호출 실패");
+        return "선택";
     }
 
     public List<School> saveSchoolsFromApi(JsonNode rowArray) {
