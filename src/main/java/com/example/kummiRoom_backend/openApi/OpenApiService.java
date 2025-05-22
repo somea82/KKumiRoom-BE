@@ -143,8 +143,8 @@ public class OpenApiService {
                         }
 
 
-                        if (existingCourseKeys.contains(key)) continue; // 중복 → 스킵
-                        if (courseNameSet.contains(courseKey)) continue;
+                        if (existingCourseKeys.contains(key)||courseNameSet.contains(courseKey)||courseName.contains("[")) continue; // 중복,정규 수업 X → 스킵
+
                         courseNameSet.add(courseKey);
                         System.out.println(courseNameSet);
                     }
