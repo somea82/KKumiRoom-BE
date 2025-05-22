@@ -12,4 +12,5 @@ public class UpdateProfileRequestDto {
     private String phone;
     private String userName;
     private LocalDate birth;
+    private String imageUrl;
 }

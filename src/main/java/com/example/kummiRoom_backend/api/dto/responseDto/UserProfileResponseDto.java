@@ -21,4 +21,5 @@ public class UserProfileResponseDto {
     private Integer grade;
     private Integer classNum;
     private SchoolDto school;
+    private String imageUrl;
 }

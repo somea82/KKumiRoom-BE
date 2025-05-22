@@ -35,6 +35,9 @@ public class User {
     private String phone;
     private LocalDate birth;
 
+    @Column(nullable = true)
+    private String imageUrl;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<TimeTable> timeTables;

@@ -42,6 +42,7 @@ public class UserService {
                 .birth(user.getBirth())
                 .phone(user.getPhone())
                 .address(user.getAddress())
+                .imageUrl(user.getImageUrl())
                 .interestMajor(majorDto)  // 여기서 안전하게 null 또는 값 세팅
                 .grade(user.getGrade())
                 .classNum(user.getClassNum())
@@ -74,6 +75,10 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setUserName(request.getUserName());
         user.setBirth(request.getBirth());
+
+        if(request.getImageUrl() != null) {
+            user.setImageUrl(request.getImageUrl());
+        }
 
         userRepository.save(user);
     }
