@@ -66,12 +66,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void updateAddressAndPhone(Long userId, UpdateProfileRequestDto request) {
+    public void updateUserProfile(Long userId, UpdateProfileRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
         user.setAddress(request.getAddress());
         user.setPhone(request.getPhone());
+        user.setUserName(request.getUserName());
+        user.setBirth(request.getBirth());
 
         userRepository.save(user);
     }

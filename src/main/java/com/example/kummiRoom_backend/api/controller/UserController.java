@@ -2,7 +2,6 @@ package com.example.kummiRoom_backend.api.controller;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
-import com.example.kummiRoom_backend.api.entity.Major;
 import com.example.kummiRoom_backend.api.service.UserService;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
@@ -39,9 +38,9 @@ public class UserController {
         }
 
         Long userId = jwtService.extractUserId(accessToken);
-        userService.updateAddressAndPhone(userId, request);
+        userService.updateUserProfile(userId, request);
 
-        return ResponseEntity.ok(new ApiResult(200, "OK", "주소와 전화번호가 성공적으로 수정되었습니다."));
+        return ResponseEntity.ok(new ApiResult(200, "OK", "내 정보가 성공적으로 수정되었습니다."));
     }
 
     @PostMapping("/major")
