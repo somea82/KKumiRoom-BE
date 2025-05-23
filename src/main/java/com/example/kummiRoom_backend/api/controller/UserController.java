@@ -1,6 +1,7 @@
 package com.example.kummiRoom_backend.api.controller;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.ChangePasswordRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateSchoolInfoRequestDto;
 import com.example.kummiRoom_backend.api.service.UserService;
@@ -11,6 +12,7 @@ import com.example.kummiRoom_backend.global.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -69,4 +71,18 @@ public class UserController {
 
         return ResponseEntity.ok(new ApiResult(200, "OK", "학교 정보가 성공적으로 수정되었습니다."));
     }
+
+    @PostMapping("/password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDto request, HttpServletRequest httpRequest) {
+        String accessToken = authService.getCookieValue(httpRequest, "accessToken");
+        if (accessToken == null) {
+            throw new UnauthorizedException("액세스 토큰이 없습니다");
+        }
+
+        Long userId = jwtService.extractUserId(accessToken);
+        userService.changePassword(userId, request);
+
+        return ResponseEntity.ok(new ApiResult(200, "OK", "비밀번호가 성공적으로 변경되었습니다."));
+    }
+
 }
