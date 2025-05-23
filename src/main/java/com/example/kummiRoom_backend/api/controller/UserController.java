@@ -2,6 +2,7 @@ package com.example.kummiRoom_backend.api.controller;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.UpdateSchoolInfoRequestDto;
 import com.example.kummiRoom_backend.api.service.UserService;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
@@ -54,5 +55,18 @@ public class UserController {
         userService.addMajor(dto,userId);
 
         return ResponseEntity.ok(new ApiResult(200,"OK","희망 학과 등록에 성공하였습니다."));
+    }
+
+    @PostMapping("/school")
+    public ResponseEntity<?> updateSchoolInfo(@RequestBody UpdateSchoolInfoRequestDto request, HttpServletRequest httpRequest) {
+        String accessToken = authService.getCookieValue(httpRequest, "accessToken");
+        if (accessToken == null) {
+            throw new UnauthorizedException("액세스 토큰이 없습니다");
+        }
+
+        Long userId = jwtService.extractUserId(accessToken);
+        userService.updateSchoolInfo(userId, request);
+
+        return ResponseEntity.ok(new ApiResult(200, "OK", "학교 정보가 성공적으로 수정되었습니다."));
     }
 }
