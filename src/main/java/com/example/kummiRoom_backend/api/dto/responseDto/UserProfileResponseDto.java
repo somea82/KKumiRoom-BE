@@ -17,9 +17,9 @@ public class UserProfileResponseDto {
     private LocalDate birth;
     private String phone;
     private String address;
+    private String imageUrl;
     private MajorDto interestMajor;
     private Integer grade;
     private Integer classNum;
     private SchoolDto school;
-    private String imageUrl;
 }
