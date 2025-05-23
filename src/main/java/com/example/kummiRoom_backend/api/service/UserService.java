@@ -2,6 +2,7 @@ package com.example.kummiRoom_backend.api.service;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.UpdateSchoolInfoRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.MajorDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.SchoolDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.UserProfileResponseDto;
@@ -11,6 +12,8 @@ import com.example.kummiRoom_backend.api.entity.User;
 import com.example.kummiRoom_backend.api.repository.MajorRepository;
 import com.example.kummiRoom_backend.api.repository.UserRepository;
 import com.example.kummiRoom_backend.global.exception.NotFoundException;
+import com.example.kummiRoom_backend.openApi.SchoolRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
+    private final SchoolRepository schoolRepository;
 
     public UserProfileResponseDto getMyProfile(Long userId) {
         User user = userRepository.findById(userId)
@@ -74,6 +78,20 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setUserName(request.getUserName());
         user.setBirth(request.getBirth());
+
+        userRepository.save(user);
+    }
+
+    public void updateSchoolInfo(Long userId, UpdateSchoolInfoRequestDto request){
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        School school = schoolRepository.findBySchoolId(request.getSchoolId());
+        if(school == null) {
+            throw new NotFoundException("해당 학교를 찾을 수 없습니다.");
+        }
+        user.setSchool(school);
+        user.setGrade(request.getGrade());
+        user.setClassNum(request.getClassNum());
 
         userRepository.save(user);
     }
