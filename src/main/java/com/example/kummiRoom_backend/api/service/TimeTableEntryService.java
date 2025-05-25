@@ -1,5 +1,6 @@
 package com.example.kummiRoom_backend.api.service;
 
+import com.example.kummiRoom_backend.api.dto.requestDto.TimeTableDeleteRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.TimeTableEntryCreateRequest;
 import com.example.kummiRoom_backend.api.dto.responseDto.TimeTableResponseDto;
 import com.example.kummiRoom_backend.api.entity.Course;
@@ -67,5 +68,19 @@ public class TimeTableEntryService {
                     .build();
         }
         timeTableEntryRepository.save(entry);
+    }
+
+    public void deleteTimeTableEntry(Long userId, TimeTableDeleteRequestDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        String currentSemester = calculateCurrentSemester();
+        TimeTable timeTable = timeTableRepository.findByUserAndSemester(user, currentSemester)
+                .orElseThrow(() -> new NotFoundException("해당 학기의 시간표가 존재하지 않습니다."));
+
+        TimeTableEntry entry = timeTableEntryRepository.findByTimeTableAndDayAndPeriod(timeTable, dto.getDay(), dto.getPeriod())
+                .orElseThrow(() -> new NotFoundException("해당 시간표 항목이 존재하지 않습니다."));
+
+        timeTableEntryRepository.delete(entry);
     }
 }
