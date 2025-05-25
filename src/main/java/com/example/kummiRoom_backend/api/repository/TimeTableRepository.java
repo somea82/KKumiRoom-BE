@@ -10,5 +10,7 @@ import java.util.Optional;
 
 public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     List<TimeTable> findByUserUserId(Long userId);
-    Optional<TimeTable> findByUserAndDayAndPeriod(User user, DayOfWeek day, Integer period);
+//    Optional<TimeTable> findByUserAndDayAndPeriod(User user, DayOfWeek day, Integer period);
+
+    Optional<TimeTable> findByUserAndSemester(User user, String semester);
 }

@@ -1,33 +1,32 @@
 package com.example.kummiRoom_backend.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "timetable")
-public class TimeTable {
+public class TimeTableEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long timeTableId;
+    private Long timeTableEntryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "course_id")
+    private Course course;
 
-    private String semester;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "timetable_id")
+    private TimeTable timeTable;
 
-    @OneToMany(mappedBy = "timeTable")
-    @JsonIgnore
-    private List<TimeTableEntry> entries;
+    private Integer period;
+
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek day;
 }

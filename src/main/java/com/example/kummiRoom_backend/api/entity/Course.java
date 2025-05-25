@@ -45,5 +45,5 @@ public class Course {
 
     @OneToMany(mappedBy = "course")
     @JsonIgnore
-    private List<TimeTable> timeTables;
+    private List<TimeTableEntry> entries;
 }

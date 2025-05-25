@@ -2,7 +2,10 @@ package com.example.kummiRoom_backend.api.controller;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.TimeTableCreateRequest;
 import com.example.kummiRoom_backend.api.dto.requestDto.TimeTableDeleteRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.TimeTableEntryCreateRequest;
+import com.example.kummiRoom_backend.api.dto.requestDto.getTimeTableRequest;
 import com.example.kummiRoom_backend.api.dto.responseDto.TimeTableResponseDto;
+import com.example.kummiRoom_backend.api.dto.responseDto.TimeTablesResponseDto;
 import com.example.kummiRoom_backend.api.entity.TimeTable;
 import com.example.kummiRoom_backend.api.service.TimeTableService;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
@@ -37,27 +40,27 @@ public class TimeTableController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getTimeTables(HttpServletRequest request) {
+    public ResponseEntity<?> getTimeTable(HttpServletRequest request) {
         String accessToken = authService.getCookieValue(request, "accessToken");
         if(accessToken == null){
             throw new UnauthorizedException("액세스 토큰이 없습니다");
         }
         Long userId = jwtService.extractUserId(accessToken);
 
-        List<TimeTableResponseDto> list = timeTableService.getTimeTablesByUserId(userId);
-        return ResponseEntity.ok(new ApiResult(200,"OK","시간표 정보를 정상적으로 불러왔습니다.",list));
+        List<TimeTableResponseDto> list = timeTableService.getTimeTable(userId);
+        return ResponseEntity.ok(new ApiResult(200,"OK","현재 학기 시간표 정보를 정상적으로 불러왔습니다.",list));
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<?> deleteTimeTable(HttpServletRequest request, @RequestBody TimeTableDeleteRequestDto dto) {
-        String accessToken = authService.getCookieValue(request, "accessToken");
-        if(accessToken == null){
-            throw new UnauthorizedException("액세스 토큰이 없습니다");
-        }
-        Long userId = jwtService.extractUserId(accessToken);
-
-        timeTableService.deleteTimeTable(dto,userId);
-        return ResponseEntity.ok(new ApiResult(200, "OK", "시간표가 정상적으로 삭제되었습니다."));
-    }
+//    @PostMapping("/delete")
+//    public ResponseEntity<?> deleteTimeTable(HttpServletRequest request, @RequestBody TimeTableDeleteRequestDto dto) {
+//        String accessToken = authService.getCookieValue(request, "accessToken");
+//        if(accessToken == null){
+//            throw new UnauthorizedException("액세스 토큰이 없습니다");
+//        }
+//        Long userId = jwtService.extractUserId(accessToken);
+//
+//        timeTableService.deleteTimeTable(dto,userId);
+//        return ResponseEntity.ok(new ApiResult(200, "OK", "시간표가 정상적으로 삭제되었습니다."));
+//    }
 
 }
