@@ -25,7 +25,7 @@ public class TimeTableEntryController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<?> createTimeTable(HttpServletRequest request, @RequestBody TimeTableEntryCreateRequest dto) {
+    public ResponseEntity<?> createTimeTableEntry(HttpServletRequest request, @RequestBody TimeTableEntryCreateRequest dto) {
         String accessToken = authService.getCookieValue(request, "accessToken");
         if(accessToken == null){
             throw new UnauthorizedException("액세스 토큰이 없습니다");
@@ -34,7 +34,8 @@ public class TimeTableEntryController {
         timeTableEntryService.createTimeTableEntry(userId,dto);
         return ResponseEntity.ok(new ApiResult(200,"OK","시간표가 정상적으로 갱신 되었습니다."));
     }
-    @DeleteMapping
+
+    @PostMapping
     public ResponseEntity<?> deleteTimeTableEntry(HttpServletRequest request, @RequestBody TimeTableDeleteRequestDto dto) {
         String accessToken = authService.getCookieValue(request, "accessToken");
         if (accessToken == null) {
