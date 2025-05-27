@@ -3,6 +3,8 @@ package com.example.kummiRoom_backend.api.controller;
 import com.example.kummiRoom_backend.api.dto.requestDto.AuthRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.RegisterRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.AuthResponseDto;
+import com.example.kummiRoom_backend.api.entity.User;
+import com.example.kummiRoom_backend.api.service.TimeTableService;
 import com.example.kummiRoom_backend.global.apiResult.ApiResult;
 import com.example.kummiRoom_backend.global.auth.AuthService;
 import com.example.kummiRoom_backend.global.auth.JwtService;
@@ -25,6 +27,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final TimeTableService timeTableService;
 
     //사용자 로그인
     @PostMapping("/sign-in")
@@ -76,7 +79,8 @@ public class AuthController {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new BadRequestException("올바른 비밀번호를 입력해주세요.");
         }
-        authService.register(request);
+        User user = authService.register(request);
+        timeTableService.createTimeTable(user.getUserId());
         return ResponseEntity.ok(new ApiResult(200, "OK", "회원가입이 완료되었습니다."));
     }
 

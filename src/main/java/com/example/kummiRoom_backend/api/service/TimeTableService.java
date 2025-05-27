@@ -30,19 +30,14 @@ public class TimeTableService {
     private final TimeTableRepository timeTableRepository;
     private final UserRepository userRepository;
 
-    public void createTimeTable(Long userId, TimeTableCreateRequest dto) {
+    public void createTimeTable(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
-
-        Optional<TimeTable> existing = timeTableRepository.findByUserAndSemester(user, dto.getSemester());
-
-        if (existing.isPresent()) {
-            throw new BadRequestException("해당 학기의 시간표가 이미 존재합니다.");
-        }
+        String currentSemester = calculateCurrentSemester();
 
         timeTableRepository.save(TimeTable.builder()
                 .user(user)
-                .semester(dto.getSemester())
+                .semester(currentSemester)
                 .build());
     }
 
@@ -55,8 +50,7 @@ public class TimeTableService {
         // 시간표 조회, 없으면 기보 시간표 생성
         TimeTable timeTable = timeTableRepository.findByUserAndSemester(user, currentSemester)
                 .orElseGet(() -> {
-                    TimeTableCreateRequest request = new TimeTableCreateRequest(currentSemester);
-                    createTimeTable(userId, request);
+                    createTimeTable(userId);
                     return timeTableRepository.findByUserAndSemester(user, currentSemester)
                             .orElseThrow(() -> new BadRequestException("시간표 생성에 실패했습니다."));
                 });

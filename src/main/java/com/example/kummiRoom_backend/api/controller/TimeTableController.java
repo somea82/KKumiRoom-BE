@@ -28,17 +28,6 @@ public class TimeTableController {
     private final JwtService jwtService;
     private final AuthService authService;
 
-    @PostMapping
-    public ResponseEntity<?> createTimeTable(HttpServletRequest request,@RequestBody TimeTableCreateRequest dto) {
-        String accessToken = authService.getCookieValue(request, "accessToken");
-        if(accessToken == null){
-            throw new UnauthorizedException("액세스 토큰이 없습니다");
-        }
-        Long userId = jwtService.extractUserId(accessToken);
-        timeTableService.createTimeTable(userId,dto);
-        return ResponseEntity.ok(new ApiResult(200,"OK","시간표가 정상적으로 갱신 되었습니다."));
-    }
-
     @GetMapping
     public ResponseEntity<?> getTimeTable(HttpServletRequest request) {
         String accessToken = authService.getCookieValue(request, "accessToken");

@@ -53,7 +53,7 @@ public class AuthService {
         return generateTokens(user.getAuthId(), user.getUserName(), user.getUserId());
     }
 
-    public void register(RegisterRequestDto request) {
+    public User register(RegisterRequestDto request) {
         try {
             //todo 비밀번호 rule 설정
             // Validate simple password ( 비밀번호는 6자 이상 12이하 )
@@ -91,7 +91,7 @@ public class AuthService {
                     .password(CryptoUtil.encrypt(request.getPassword())) // 암호화 후 저장
                     .build();
 
-            userRepository.save(newUser);
+            return userRepository.save(newUser);
 
         } catch (Exception e) {
             e.printStackTrace();
