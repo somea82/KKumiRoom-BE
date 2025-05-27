@@ -1,6 +1,7 @@
 package com.example.kummiRoom_backend.api.service;
 
 import com.example.kummiRoom_backend.api.dto.requestDto.AddMajorRequestDto;
+import com.example.kummiRoom_backend.api.dto.requestDto.ChangePasswordRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateProfileRequestDto;
 import com.example.kummiRoom_backend.api.dto.requestDto.UpdateSchoolInfoRequestDto;
 import com.example.kummiRoom_backend.api.dto.responseDto.MajorDto;
@@ -11,11 +12,16 @@ import com.example.kummiRoom_backend.api.entity.School;
 import com.example.kummiRoom_backend.api.entity.User;
 import com.example.kummiRoom_backend.api.repository.MajorRepository;
 import com.example.kummiRoom_backend.api.repository.UserRepository;
+import com.example.kummiRoom_backend.global.config.security.CryptoUtil;
+import com.example.kummiRoom_backend.global.exception.BadRequestException;
 import com.example.kummiRoom_backend.global.exception.NotFoundException;
 import com.example.kummiRoom_backend.openApi.SchoolRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -100,4 +106,30 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    @Transactional
+    public void changePassword(Long userId, @NotNull ChangePasswordRequestDto request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+
+        try {
+            String decryptedPassword = CryptoUtil.decrypt(user.getPassword());
+            if (!decryptedPassword.equals(request.getCurrentPassword())) {
+                throw new BadRequestException("현재 비밀번호가 일치하지 않습니다.");
+            }
+
+            String newPassword = request.getNewPassword();
+            if (newPassword == null || newPassword.length() < 6 || newPassword.length() > 13) {
+                throw new BadRequestException("새 비밀번호는 6자 이상 13자 이하로 입력해주세요.");
+            }
+
+            user.setPassword(CryptoUtil.encrypt(newPassword));
+            userRepository.save(user);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("비밀번호 변경 실패: " + e.getMessage());
+        }
+    }
+
 }
