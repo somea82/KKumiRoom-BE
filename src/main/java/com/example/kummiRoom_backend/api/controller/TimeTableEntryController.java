@@ -35,7 +35,7 @@ public class TimeTableEntryController {
         return ResponseEntity.ok(new ApiResult(200,"OK","시간표가 정상적으로 갱신 되었습니다."));
     }
 
-    @PostMapping
+    @PostMapping("/delete")
     public ResponseEntity<?> deleteTimeTableEntry(HttpServletRequest request, @RequestBody TimeTableDeleteRequestDto dto) {
         String accessToken = authService.getCookieValue(request, "accessToken");
         if (accessToken == null) {
